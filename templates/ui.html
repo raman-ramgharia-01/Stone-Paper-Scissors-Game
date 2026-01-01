@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stone Paper Scissors Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='style.css')}}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Stone Paper Scissors</h1>
+            <p class="subtitle">Choose your weapon and challenge the computer! Stone beats scissors, scissors beat paper, and paper beats stone.</p>
+        </header>
+
+        <div class="game-area">
+            <div class="cards-container">
+                <div class="card" id="stone-card">
+                    <div class="card-icon">
+                        <i class="fas fa-gem stone-icon"></i>
+                    </div>
+                    <h2 class="card-title">STONE</h2>
+                    <p class="card-desc">Strong and unbreakable. Crushes scissors but gets wrapped by paper.</p>
+                </div>
+
+                <div class="card" id="paper-card">
+                    <div class="card-icon">
+                        <i class="fas fa-scroll paper-icon"></i>
+                    </div>
+                    <h2 class="card-title">PAPER</h2>
+                    <p class="card-desc">Soft and flexible. Wraps stone but gets cut by scissors.</p>
+                </div>
+
+                <div class="card" id="scissors-card">
+                    <div class="card-icon">
+                        <i class="fas fa-cut scissors-icon"></i>
+                    </div>
+                    <h2 class="card-title">SCISSORS</h2>
+                    <p class="card-desc">Sharp and precise. Cuts paper but gets crushed by stone.</p>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="btn play-btn" id="play-btn">
+                    <i class="fas fa-play-circle"></i> Play Game
+                </button>
+                <button class="btn reset-btn" id="reset-btn">
+                    <i class="fas fa-redo-alt"></i> Reset Game
+                </button>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h2 class="results-title">Game Results</h2>
+            
+            <div class="results-content">
+                <div class="player-choice">
+                    <div class="choice-label">Your Choice</div>
+                    <div class="choice-display" id="player-choice-display">
+                        <i class="fas fa-question"></i>
+                    </div>
+                    <div class="choice-name" id="player-choice-name">Not selected</div>
+                </div>
+
+                <div class="game-result">
+                    <div class="choice-label">Result</div>
+                    <div class="choice-display">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="result-text" id="result-text">Choose & Play!</div>
+                </div>
+
+                <div class="computer-choice">
+                    <div class="choice-label">Computer Choice</div>
+                    <div class="choice-display" id="computer-choice-display">
+                        <i class="fas fa-question"></i>
+                    </div>
+                    <div class="choice-name" id="computer-choice-name">Waiting</div>
+                </div>
+            </div>
+
+            <div class="scoreboard">
+                <div class="score-item">
+                    <div class="score-value" id="player-score">0</div>
+                    <div class="score-label">Player Wins</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-value" id="draw-score">0</div>
+                    <div class="score-label">Draws</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-value" id="computer-score">0</div>
+                    <div class="score-label">Computer Wins</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rules">
+            <h3>How to Play</h3>
+            <ul class="rules-list">
+                <li><i class="fas fa-fist-raised"></i> Stone beats Scissors</li>
+                <li><i class="fas fa-scroll"></i> Paper beats Stone</li>
+                <li><i class="fas fa-cut"></i> Scissors beat Paper</li>
+                <li><i class="fas fa-equals"></i> Same choices result in a draw</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>Stone Paper Scissors Game &copy; 2023 | Designed with <i class="fas fa-heart" style="color:#ff7e5f"></i></p>
+        </footer>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        
+        let playerChoice = null;
+        let playerScore = 0;
+        let computerScore = 0;
+        let drawScore = 0;
+
+        
+        const stoneCard = document.getElementById('stone-card');
+        const paperCard = document.getElementById('paper-card');
+        const scissorsCard = document.getElementById('scissors-card');
+        const playBtn = document.getElementById('play-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const playerChoiceDisplay = document.getElementById('player-choice-display');
+        const playerChoiceName = document.getElementById('player-choice-name');
+        const computerChoiceDisplay = document.getElementById('computer-choice-display');
+        const computerChoiceName = document.getElementById('computer-choice-name');
+        const resultText = document.getElementById('result-text');
+        const playerScoreElem = document.getElementById('player-score');
+        const computerScoreElem = document.getElementById('computer-score');
+        const drawScoreElem = document.getElementById('draw-score');
+
+        
+        stoneCard.addEventListener('click', () => selectCard('stone'));
+        paperCard.addEventListener('click', () => selectCard('paper'));
+        scissorsCard.addEventListener('click', () => selectCard('scissors'));
+
+        
+        playBtn.addEventListener('click', playGame);
+        resetBtn.addEventListener('click', resetGame);
+
+        
+        function selectCard(choice) {
+            
+            stoneCard.classList.remove('selected');
+            paperCard.classList.remove('selected');
+            scissorsCard.classList.remove('selected');
+
+            
+            if (choice === 'stone') {
+                stoneCard.classList.add('selected');
+                playerChoice = 'stone';
+            } else if (choice === 'paper') {
+                paperCard.classList.add('selected');
+                playerChoice = 'paper';
+            } else if (choice === 'scissors') {
+                scissorsCard.classList.add('selected');
+                playerChoice = 'scissors';
+            }
+
+            
+            updatePlayerChoiceDisplay();
+        }
+
+        
+        function updatePlayerChoiceDisplay() {
+            if (playerChoice === 'stone') {
+                playerChoiceDisplay.innerHTML = '<i class="fas fa-gem stone-icon"></i>';
+                playerChoiceName.textContent = 'STONE';
+            } else if (playerChoice === 'paper') {
+                playerChoiceDisplay.innerHTML = '<i class="fas fa-scroll paper-icon"></i>';
+                playerChoiceName.textContent = 'PAPER';
+            } else if (playerChoice === 'scissors') {
+                playerChoiceDisplay.innerHTML = '<i class="fas fa-cut scissors-icon"></i>';
+                playerChoiceName.textContent = 'SCISSORS';
+            } else {
+                playerChoiceDisplay.innerHTML = '<i class="fas fa-question"></i>';
+                playerChoiceName.textContent = 'Not selected';
+            }
+        }
+
+        
+        function playGame() {
+            if (!playerChoice) {
+                resultText.textContent = "Please select a card first!";
+                resultText.className = "result-text lose";
+                return;
+            }
+
+            
+            let choiceChar = '';
+            if (playerChoice === 'stone') choiceChar = 's';
+            else if (playerChoice === 'paper') choiceChar = 'p';
+            else if (playerChoice === 'scissors') choiceChar = 'c';
+
+            
+            $.ajax({
+                url: '/operation',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ choice: choiceChar }),
+                success: function(resp) {
+                    console.log("Server response: ", resp);
+                    
+                    
+                    const data = resp;
+                    
+                    
+                    updateComputerChoiceDisplay(data.bot_choice);
+                    
+                    
+                    updateResultDisplay(data.result);
+                    
+                    
+                    updateScores(data.result);
+                    
+                    
+                    playerChoice = null;
+                    stoneCard.classList.remove('selected');
+                    paperCard.classList.remove('selected');
+                    scissorsCard.classList.remove('selected');
+                    
+                    
+                    setTimeout(() => {
+                        playerChoiceDisplay.innerHTML = '<i class="fas fa-question"></i>';
+                        playerChoiceName.textContent = 'Not selected';
+                    }, 2000);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX error: ", textStatus, errorThrown);
+                    resultText.textContent = "Error connecting to server!";
+                    resultText.className = "result-text lose";
+                }
+            });
+        }
+
+        
+        function updateComputerChoiceDisplay(botChoice) {
+            if (botChoice === 's') {
+                computerChoiceDisplay.innerHTML = '<i class="fas fa-gem stone-icon"></i>';
+                computerChoiceName.textContent = 'STONE';
+            } else if (botChoice === 'p') {
+                computerChoiceDisplay.innerHTML = '<i class="fas fa-scroll paper-icon"></i>';
+                computerChoiceName.textContent = 'PAPER';
+            } else if (botChoice === 'c') {
+                computerChoiceDisplay.innerHTML = '<i class="fas fa-cut scissors-icon"></i>';
+                computerChoiceName.textContent = 'SCISSORS';
+            }
+        }
+
+        
+        function updateResultDisplay(result) {
+            let resultTextContent = '';
+            let resultClass = '';
+            
+            if (result === 'win') {
+                resultTextContent = "You WIN!";
+                resultClass = "win";
+            } else if (result === 'lose') {
+                resultTextContent = "Computer WINS!";
+                resultClass = "lose";
+            } else if (result === 'draw') {
+                resultTextContent = "It's a DRAW!";
+                resultClass = "draw";
+            }
+            
+            resultText.textContent = resultTextContent;
+            resultText.className = `result-text ${resultClass}`;
+        }
+
+        
+        function updateScores(result) {
+            if (result === 'win') {
+                playerScore++;
+                playerScoreElem.textContent = playerScore;
+            } else if (result === 'lose') {
+                computerScore++;
+                computerScoreElem.textContent = computerScore;
+            } else if (result === 'draw') {
+                drawScore++;
+                drawScoreElem.textContent = drawScore;
+            }
+        }
+
+        
+        function resetGame() {
+            
+            playerChoice = null;
+            playerScore = 0;
+            computerScore = 0;
+            drawScore = 0;
+
+            
+            playerChoiceDisplay.innerHTML = '<i class="fas fa-question"></i>';
+            playerChoiceName.textContent = 'Not selected';
+            computerChoiceDisplay.innerHTML = '<i class="fas fa-question"></i>';
+            computerChoiceName.textContent = 'Waiting';
+            resultText.textContent = 'Choose & Play!';
+            resultText.className = 'result-text';
+
+            
+            playerScoreElem.textContent = '0';
+            computerScoreElem.textContent = '0';
+            drawScoreElem.textContent = '0';
+
+            
+            stoneCard.classList.remove('selected');
+            paperCard.classList.remove('selected');
+            scissorsCard.classList.remove('selected');
+        }
+
+        
+        updatePlayerChoiceDisplay();
+    </script>
+</body>
+</html>
